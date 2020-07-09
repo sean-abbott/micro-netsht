@@ -29,6 +29,8 @@ jobs:
         if: success() && github.event_name != 'pull_request'
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}"
       -
         name: Run Buildx
         run: |
