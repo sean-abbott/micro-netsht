@@ -25,9 +25,20 @@ jobs:
         name: Available platforms
         run: echo ${{ steps.buildx.outputs.platforms }}
       -
+        name: Docker Login
+        if: success() && github.event_name != 'pull_request'
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      -
         name: Run Buildx
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x,linux/386,linux/arm/v7,linux/arm/v6 \
-            --output "type=image,push=false" \
+            --output "type=image,push=true" \
+            --tag seanabbott/micro-netsht \
             --file ./Dockerfile .
+      -
+        name: Docker Check Manifest
+        if: always() && github.event_name != 'pull_request'
+        run: |
+          docker run --rm mplatform/mquery seanabbott/micro-netsht:latest
